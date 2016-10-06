@@ -1,0 +1,10 @@
+{
+  "name": "cork",
+  "type": "influxdb",
+  "url": "http://influxdb:8086",
+  "access": "proxy",
+  "user": "lang3r",
+  "password": "feen",
+  "database": "cork",
+  "basicAuth": false
+}

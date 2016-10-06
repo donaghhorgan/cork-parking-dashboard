@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  scraper:
+    build: scraper
+    env_file: configuration.env
+  influxdb:
+    build: influxdb
+    env_file: configuration.env
+    ports:
+      - '127.0.0.1:8086:8086'
+      - '127.0.0.1:8083:8083'
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+  grafana:
+    build: grafana
+    env_file: configuration.env
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_conf:/etc/grafana
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  grafana_conf: {}
+  grafana_data: {}
+  influxdb_data: {}
