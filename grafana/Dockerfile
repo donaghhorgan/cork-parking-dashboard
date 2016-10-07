@@ -2,7 +2,7 @@ FROM grafana/grafana:3.1.1
 MAINTAINER Donagh Horgan <me@donagh.io>
 
 RUN apt-get update && \
-    apt-get install -y curl && \
+    apt-get install -y curl gettext-base && \
     rm -rf /var/lib/apt/lists/*
 
 COPY dashboards /etc/grafana/dashboards
