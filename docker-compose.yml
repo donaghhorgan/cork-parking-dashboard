@@ -20,10 +20,8 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - grafana_conf:/etc/grafana
       - grafana_data:/var/lib/grafana
 
 volumes:
-  grafana_conf: {}
   grafana_data: {}
   influxdb_data: {}
