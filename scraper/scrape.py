@@ -26,11 +26,11 @@ def to_influxdb_point(record):
         },
         'time': record['date'],
         'fields': {
-            'free_spaces': record['free_spaces'],
-            'latitude': record['latitude'],
-            'longitude': record['longitude'],
-            'geohash': Geohash.encode(record['latitude'], record['longitude'], 12),
-            'spaces': record['spaces']
+            'free_spaces': int(record['free_spaces']),
+            'latitude': float(record['latitude']),
+            'longitude': float(record['longitude']),
+            'geohash': Geohash.encode(float(record['latitude']), float(record['longitude']), 12),
+            'spaces': int(record['spaces'])
         }
     }
 
