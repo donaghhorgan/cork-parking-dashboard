@@ -20,7 +20,7 @@ if [ ! -f "/var/lib/grafana/.init" ]; then
     done
 
     for dashboard in /etc/grafana/dashboards/*; do
-        post "$(envsubst < $dashboard)" "/api/dashboards/db"
+        post "$(cat $dashboard)" "/api/dashboards/db"
     done
 
     touch "/var/lib/grafana/.init"
