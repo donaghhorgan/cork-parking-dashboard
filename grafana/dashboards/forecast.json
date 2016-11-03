@@ -1353,7 +1353,7 @@
         },
         "time": {
             "from": "now-2w",
-            "to": "now"
+            "to": "now+1d"
         },
         "timepicker": {
             "refresh_intervals": [
