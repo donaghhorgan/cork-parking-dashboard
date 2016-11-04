@@ -1027,7 +1027,7 @@
                                 "hide": false,
                                 "measurement": "carpark",
                                 "policy": "default",
-                                "query": "SELECT \"free_spaces\" FROM \"carpark\" GROUP BY \"name\" fill(previous)",
+                                "query": "SELECT MEAN(\"free_spaces\") FROM \"carpark\" WHERE time <= now() GROUP BY \"name\", time(1h) fill(previous)",
                                 "rawQuery": true,
                                 "refId": "A",
                                 "resultFormat": "time_series",
