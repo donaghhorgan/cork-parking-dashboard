@@ -8,7 +8,7 @@ from influxdb import InfluxDBClient
 
 
 URL='http://data.corkcity.ie/api/action/datastore_search'
-RESOURCE_ID='c8735eb1-6da3-4dbd-9541-8995ba36a424'
+RESOURCE_ID='6cc1028e-7388-4bc5-95b7-667a59aa76dc'
 
 
 def to_get_request(url, **kwargs):
