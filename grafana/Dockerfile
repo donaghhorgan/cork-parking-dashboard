@@ -1,4 +1,4 @@
-FROM grafana/grafana:4.1.1
+FROM grafana/grafana:4.3.2
 MAINTAINER Donagh Horgan <me@donagh.io>
 
 RUN apt-get update && \
