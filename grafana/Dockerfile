@@ -8,7 +8,6 @@ RUN apt-get update && \
 WORKDIR /etc/grafana
 COPY dashboards ./dashboards
 COPY datasources ./datasources
-COPY plugins ./
 
 WORKDIR /app
 COPY entrypoint.sh ./

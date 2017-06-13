@@ -11,10 +11,6 @@ post() {
 if [ ! -f "/var/lib/grafana/.init" ]; then
     exec /run.sh $@ &
 
-    while read plugin; do
-        grafana-cli plugins install "$plugin"
-    done </etc/grafana/plugins
-
     until curl -s "$url/api/datasources" 2> /dev/null; do
         sleep 1
     done
