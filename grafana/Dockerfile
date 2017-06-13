@@ -5,8 +5,10 @@ RUN apt-get update && \
     apt-get install -y curl gettext-base && \
     rm -rf /var/lib/apt/lists/*
 
-COPY dashboards /etc/grafana/dashboards
-COPY datasources /etc/grafana/datasources
+WORKDIR /etc/grafana
+COPY dashboards ./dashboards
+COPY datasources ./datasources
+COPY plugins ./
 
 WORKDIR /app
 COPY entrypoint.sh ./
