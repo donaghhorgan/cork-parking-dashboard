@@ -1,10 +1,6 @@
 version: '2'
 
 services:
-  scraper:
-    build: scraper
-    env_file: configuration.env
-    restart: always
   influxdb:
     build: influxdb
     env_file: configuration.env
@@ -24,6 +20,10 @@ services:
     restart: always
     volumes:
       - grafana_data:/var/lib/grafana
+  scraper-carparks:
+    build: scrapers/carparks
+    env_file: configuration.env
+    restart: always
 
 volumes:
   grafana_data: {}
