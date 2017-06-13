@@ -1,2 +1,5 @@
 # Temporary Linux files
 *~
+
+# PyCharm files
+.idea/
