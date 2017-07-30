@@ -23,10 +23,14 @@ services:
   scraper-bikes:
     build: scrapers/bikes
     env_file: configuration.env
+    links:
+      - influxdb
     restart: always
   scraper-carparks:
     build: scrapers/carparks
     env_file: configuration.env
+    links:
+      - influxdb
     restart: always
 
 volumes:
