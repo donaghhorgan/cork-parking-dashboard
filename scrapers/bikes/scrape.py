@@ -76,11 +76,7 @@ if __name__ == '__main__':
 
         # Convert the response data to InfluxDB point format
         stations = get_station_data(args.api_key, scheme='cork')
-        for station in stations:
-            print station
         points = list(map(to_influxdb_point, stations))
-        for point in points:
-            print point
 
         # Connect to InfluxDB and write the data
         client = InfluxDBClient(args.host, args.port, args.username,
