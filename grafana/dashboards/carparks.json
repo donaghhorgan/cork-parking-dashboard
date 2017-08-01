@@ -235,7 +235,7 @@
               "rgba(245, 54, 54, 0.9)"
             ],
             "datasource": "cork",
-            "decimals": null,
+            "decimals": 2,
             "format": "percentunit",
             "gauge": {
               "maxValue": 1,
