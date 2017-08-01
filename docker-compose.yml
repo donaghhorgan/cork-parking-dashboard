@@ -27,6 +27,11 @@ services:
     env_file: configuration.env
     links:
       - influxdb
+  scraper-river-levels:
+    build: scrapers/river-levels
+    env_file: configuration.env
+    links:
+      - influxdb
 
 volumes:
   grafana_data: {}

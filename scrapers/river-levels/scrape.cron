@@ -1,0 +1,1 @@
+* * * * * python /app/scrape.py $INFLUX_USER $INFLUX_PASSWORD > /proc/$(cat /var/run/crond.pid)/fd/1 2>&1
