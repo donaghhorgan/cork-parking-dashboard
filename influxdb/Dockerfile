@@ -1,4 +1,4 @@
-FROM influxdb:1.2.4-alpine
+FROM influxdb:1.3.1-alpine
 MAINTAINER Donagh Horgan <me@donagh.io>
 
 WORKDIR /app
