@@ -88,7 +88,7 @@
                 ],
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT SUM(*) FROM (SELECT LAST(*) FROM (SELECT LAST(\"bikes_available\") FROM \"bikes\" WHERE \"station_name\" =~ /^$station_name$/ AND $timeFilter GROUP BY \"station_name\", time(1h)) GROUP BY \"station_name\")",
+                "query": "SELECT SUM(last) FROM (SELECT LAST(\"bikes_available\") FROM \"bikes\" WHERE $timeFilter AND \"station_name\" =~ /^$station_name$/ GROUP BY \"station_name\")",
                 "rawQuery": true,
                 "refId": "A",
                 "resultFormat": "time_series",
@@ -110,7 +110,7 @@
               }
             ],
             "thresholds": "",
-            "title": "Free spaces",
+            "title": "Free bikes",
             "type": "singlestat",
             "valueFontSize": "80%",
             "valueMaps": [
@@ -195,7 +195,7 @@
                 ],
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT SUM(*) FROM (SELECT LAST(*) FROM (SELECT LAST(\"docks_count\") FROM \"bikes\" WHERE \"station_name\" =~ /^$station_name$/ AND $timeFilter GROUP BY \"station_name\", time(1h)) GROUP BY \"station_name\")",
+                "query": "SELECT SUM(last) FROM (SELECT LAST(\"docks_available\") FROM \"bikes\" WHERE $timeFilter AND \"station_name\" =~ /^$station_name$/ GROUP BY \"station_name\")",
                 "rawQuery": true,
                 "refId": "A",
                 "resultFormat": "time_series",
@@ -217,7 +217,7 @@
               }
             ],
             "thresholds": "",
-            "title": "Total spaces",
+            "title": "Free docks",
             "type": "singlestat",
             "valueFontSize": "80%",
             "valueMaps": [
@@ -231,7 +231,7 @@
           },
           {
             "cacheTimeout": null,
-            "colorBackground": true,
+            "colorBackground": false,
             "colorValue": false,
             "colors": [
               "rgba(50, 172, 45, 0.97)",
@@ -239,8 +239,8 @@
               "rgba(245, 54, 54, 0.9)"
             ],
             "datasource": "cork",
-            "decimals": 2,
-            "format": "percentunit",
+            "decimals": null,
+            "format": "none",
             "gauge": {
               "maxValue": 1,
               "minValue": 0,
@@ -303,7 +303,7 @@
                 ],
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT 1 - SUM(\"free_spaces\") / SUM(\"spaces\") FROM (SELECT LAST(\"free_spaces\") AS \"free_spaces\", LAST(\"spaces\") AS \"spaces\" FROM (SELECT LAST(\"bikes_available\") AS \"free_spaces\", LAST(\"docks_count\") AS \"spaces\" FROM \"bikes\" WHERE \"station_name\" =~ /^$station_name$/ AND $timeFilter GROUP BY \"station_name\", time(1h)) GROUP BY \"station_name\")",
+                "query": "SELECT SUM(last) FROM (SELECT LAST(\"docks_count\") FROM \"bikes\" WHERE $timeFilter AND \"station_name\" =~ /^$station_name$/ GROUP BY \"station_name\")",
                 "rawQuery": true,
                 "refId": "A",
                 "resultFormat": "time_series",
@@ -325,7 +325,7 @@
               }
             ],
             "thresholds": "0.5, 0.8",
-            "title": "Occupancy",
+            "title": "Total docks",
             "type": "singlestat",
             "valueFontSize": "80%",
             "valueMaps": [
@@ -378,6 +378,8 @@
         "panels": [
           {
             "aliasColors": {
+              "Free bikes": "#7EB26D",
+              "Free docks": "#EAB839",
               "Historical": "#1F78C1",
               "Predicted": "#EAB839"
             },
@@ -385,7 +387,7 @@
             "dashLength": 10,
             "dashes": false,
             "datasource": "cork",
-            "fill": 7,
+            "fill": 0,
             "id": 2,
             "legend": {
               "alignAsTable": false,
@@ -400,26 +402,39 @@
               "values": false
             },
             "lines": true,
-            "linewidth": 0,
+            "linewidth": 2,
             "links": [],
             "nullPointMode": "null",
             "percentage": false,
             "pointradius": 5,
             "points": false,
             "renderer": "flot",
-            "seriesOverrides": [],
+            "seriesOverrides": [
+              {
+                "alias": "bikes.bikes_predicted",
+                "color": "#7EB26D",
+                "dashes": true,
+                "legend": false
+              },
+              {
+                "alias": "bikes.docks_predicted",
+                "color": "#EAB839",
+                "dashes": true,
+                "legend": false
+              }
+            ],
             "spaceLength": 10,
             "span": 12,
             "stack": false,
             "steppedLine": false,
             "targets": [
               {
-                "alias": "$col",
+                "alias": "Free bikes",
                 "dsType": "influxdb",
                 "groupBy": [
                   {
                     "params": [
-                      "$interval"
+                      "$__interval"
                     ],
                     "type": "time"
                   },
@@ -433,9 +448,9 @@
                 "hide": false,
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT HOLT_WINTERS(MEAN(\"Occupancy\"), 24, 24) AS \"Predicted\" FROM (SELECT 100 - 100 * \"bikes_available\" / \"docks_count\" AS \"Occupancy\" FROM \"bikes\" WHERE \"station_name\" =~ /^$station_name$/) WHERE time > now() - 4w AND time <= now() GROUP BY time(1h) fill(none)",
+                "query": "SELECT SUM(mean) FROM (SELECT MEAN(\"bikes_available\") FROM \"bikes\" WHERE $timeFilter GROUP BY time(1h), \"station_name\") WHERE \"station_name\" =~ /^$station_name$/ AND $timeFilter GROUP BY time(1h)",
                 "rawQuery": true,
-                "refId": "B",
+                "refId": "C",
                 "resultFormat": "time_series",
                 "select": [
                   [
@@ -454,12 +469,12 @@
                 "tags": []
               },
               {
-                "alias": "$col",
+                "alias": "",
                 "dsType": "influxdb",
                 "groupBy": [
                   {
                     "params": [
-                      "$interval"
+                      "$__interval"
                     ],
                     "type": "time"
                   },
@@ -473,9 +488,86 @@
                 "hide": false,
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT 100 * (1 - SUM(\"bikes_available\") / SUM(\"docks_count\")) AS \"Historical\" FROM (SELECT \"bikes_available\", \"docks_count\" FROM \"bikes\" WHERE \"station_name\" =~ /^$station_name$/ GROUP BY \"station_name\") WHERE $timeFilter AND time < now() GROUP BY time(30m) fill(previous)",
+                "query": "SELECT HOLT_WINTERS(SUM(mean), 24, 24) AS \"bikes_predicted\" FROM (SELECT MEAN(\"bikes_available\") FROM \"bikes\" WHERE $timeFilter GROUP BY time(1h), \"station_name\") WHERE time > now() - 2w AND time <= now() AND \"station_name\" =~ /^$station_name$/ GROUP BY time(1h) fill(none)",
+                "rawQuery": true,
+                "refId": "D",
+                "resultFormat": "time_series",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              },
+              {
+                "alias": "Free docks",
+                "dsType": "influxdb",
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT SUM(mean) FROM (SELECT MEAN(\"docks_available\") FROM \"bikes\" WHERE $timeFilter GROUP BY time(1h), \"station_name\") WHERE \"station_name\" =~ /^$station_name$/ AND $timeFilter GROUP BY time(1h)",
                 "rawQuery": true,
                 "refId": "A",
+                "resultFormat": "time_series",
+                "select": [
+                  [
+                    {
+                      "params": [
+                        "value"
+                      ],
+                      "type": "field"
+                    },
+                    {
+                      "params": [],
+                      "type": "mean"
+                    }
+                  ]
+                ],
+                "tags": []
+              },
+              {
+                "dsType": "influxdb",
+                "groupBy": [
+                  {
+                    "params": [
+                      "$__interval"
+                    ],
+                    "type": "time"
+                  },
+                  {
+                    "params": [
+                      "null"
+                    ],
+                    "type": "fill"
+                  }
+                ],
+                "orderByTime": "ASC",
+                "policy": "default",
+                "query": "SELECT HOLT_WINTERS(SUM(mean), 24, 24) AS \"docks_predicted\" FROM (SELECT MEAN(\"docks_available\") FROM \"bikes\" WHERE $timeFilter GROUP BY time(1h), \"station_name\") WHERE time > now() - 2w AND time <= now() AND \"station_name\" =~ /^$station_name$/ GROUP BY time(1h) fill(none)",
+                "rawQuery": true,
+                "refId": "B",
                 "resultFormat": "time_series",
                 "select": [
                   [
@@ -499,7 +591,7 @@
             "timeShift": null,
             "title": "",
             "tooltip": {
-              "shared": false,
+              "shared": true,
               "sort": 0,
               "value_type": "individual"
             },
@@ -513,10 +605,10 @@
             },
             "yaxes": [
               {
-                "format": "percent",
-                "label": "Occupancy",
+                "format": "none",
+                "label": "",
                 "logBase": 1,
-                "max": "100",
+                "max": null,
                 "min": "0",
                 "show": true
               },
@@ -553,8 +645,8 @@
             "scroll": true,
             "showHeader": true,
             "sort": {
-              "col": 4,
-              "desc": false
+              "col": 2,
+              "desc": true
             },
             "span": 6,
             "styles": [
@@ -627,7 +719,7 @@
                 ],
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT \"Free\", \"Total\", (1 - \"Free\" / \"Total\") AS \"Occupancy\" FROM (SELECT LAST(\"bikes_available\") AS \"Free\", LAST(\"docks_count\") AS \"Total\" FROM \"bikes\" WHERE $timeFilter) GROUP BY \"station_name\"",
+                "query": "SELECT LAST(\"bikes_available\") AS \"Free bikes\", LAST(\"docks_available\") AS \"Free docks\", LAST(\"docks_count\") AS \"Total docks\" FROM \"bikes\" WHERE $timeFilter GROUP BY \"station_name\"",
                 "rawQuery": true,
                 "refId": "A",
                 "resultFormat": "table",
@@ -697,7 +789,7 @@
                 ],
                 "orderByTime": "ASC",
                 "policy": "default",
-                "query": "SELECT 100 * (LAST(\"bikes_available\") / LAST(\"docks_count\")) AS \"metric\", LAST(\"geohash\") AS \"geohash\" FROM \"bikes\" WHERE $timeFilter - 1h GROUP BY \"station_name\"",
+                "query": "SELECT LAST(\"bikes_available\") AS \"metric\", LAST(\"geohash\") AS \"geohash\" FROM \"bikes\" WHERE $timeFilter GROUP BY \"station_name\"",
                 "rawQuery": true,
                 "refId": "A",
                 "resultFormat": "table",
@@ -718,12 +810,12 @@
                 "tags": []
               }
             ],
-            "thresholds": "20, 50",
+            "thresholds": "5, 10",
             "title": "",
             "type": "grafana-worldmap-panel",
-            "unitPlural": "% Free",
+            "unitPlural": "bikes",
             "unitSingle": "",
-            "unitSingular": "% Free",
+            "unitSingular": "bike",
             "valueName": "current"
           }
         ],
