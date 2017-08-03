@@ -48,7 +48,7 @@ def to_influxdb_point(station_data):
             'station_name': station_data['name'],
             'station_name_irish': station_data['nameIrish']
         },
-        'time': TZ_CORK.localize(dateutil.parser.parse(station_data['dateStatus'])).isoformat(),
+        'time': TZ_CORK.localize(dateutil.parser.parse(station_data['dateStatus'], dayfirst=True)).isoformat(),
         'fields': {
             'bikes_available': station_data['bikesAvailable'],
             'docks_available': station_data['docksAvailable'],
