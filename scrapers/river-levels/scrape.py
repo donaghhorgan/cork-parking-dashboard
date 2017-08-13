@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import datetime
 import logging
 
 import Geohash
@@ -15,6 +14,7 @@ NAMES = {
     Geohash.encode(51.894643, -8.512962, 12): 'Lee Road',
     Geohash.encode(51.897843, -8.56668, 12): 'Angler\'s Rest'
 }
+
 
 def get_response(url, **params):
     response = requests.get(url, params=params)
@@ -72,20 +72,14 @@ if __name__ == '__main__':
         parser.add_argument('--database', default='cork')
         args = parser.parse_args()
 
-        # Connect to InfluxDB
+        # Get the latest data
+        records = get_river_levels()
+        points = list(map(to_influxdb_point, records))
+
+        # Connect to InfluxDB and write the data
         client = InfluxDBClient(args.host, args.port, args.username,
                                 args.password, args.database)
         client.create_database(args.database)
-
-        # Get the latest data, or all data if no previous measurements exist
-        result = client.query('SHOW MEASUREMENTS;', database=args.database)
-        if 'river-levels' in result.keys():
-            records = get_river_levels()
-        else:
-            records = get_river_levels(limit=get_total_records())
-
-        # Write the data to InfluxDB
-        points = list(map(to_influxdb_point, records))
         client.write_points(points)
     except:
         logging.exception('Could not scrape data')
